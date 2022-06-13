@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apigw-deployment
+  labels:
+    app: apigw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apigw
+  template:
+    metadata:
+      labels:
+        app: apigw
+    spec:
+      containers:
+      - name: apigw
+        image: dioji/apigw
+        ports:
+        - containerPort: 9090
+        env:
+        - name: EUREKA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: eureka-url
+        - name: ZIPKIN_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: zipkin-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apigw-service
+spec:
+  type: NodePort
+  selector:
+    app: apigw
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+      nodePort: 30200

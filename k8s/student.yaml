@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-deployment
+  labels:
+    app: student
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student
+  template:
+    metadata:
+      labels:
+        app: student
+    spec:
+      containers:
+      - name: student
+        image: dioji/student-svc
+        ports:
+        - containerPort: 8080
+        env:
+        - name: EUREKA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: eureka-url
+        - name: ZIPKIN_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: zipkin-url
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: mysql-url
+        - name: ADDRESS_SVC_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: address-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-service
+spec:
+  selector:
+    app: student
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

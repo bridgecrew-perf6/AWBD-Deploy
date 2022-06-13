@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: address-deployment
+  labels:
+    app: address
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: address
+  template:
+    metadata:
+      labels:
+        app: address
+    spec:
+      containers:
+      - name: address
+        image: dioji/address-svc
+        ports:
+        - containerPort: 8082
+        env:
+        - name: EUREKA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: eureka-url
+        - name: ZIPKIN_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: zipkin-url
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: mysql-url
+        - name: CONFIG_SERVER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: awbd-config
+              key: config-server-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: address-service
+spec:
+  selector:
+    app: address
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082

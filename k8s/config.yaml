@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: awbd-config
+data:
+  mysql-url: mysql-service
+  zipkin-url: zipkin-service
+  eureka-url: eureka-service
+  config-server-url: config-server-service
+  student-url: student-service
+  address-url: address-service
+  config-server-url: config-server-service
